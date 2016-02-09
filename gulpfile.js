@@ -8,7 +8,7 @@ var gulp    = require('gulp'),
 
 gulp.task('js-hint', function() {
   gulp.src('src/*.js')
-      .pipe(jshint())
+      .pipe(jshint({laxcomma: true}))
       .pipe(jshint.reporter(stylish));
 });
 
@@ -20,10 +20,9 @@ gulp.task('js-compile', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch('src/*.js', ['js-hint', 'js-compile']);
+  gulp.watch('src/*.js', ['js-hint']);
 });
 
 gulp.task('default', [ 'js-hint'
-                     , 'js-compile'
                      , 'watch' ]);
   
