@@ -24,7 +24,7 @@ EC.prototype.createCanvas = function( width, height, imageData, ox, oy ) {
   var data,
       canvas,
       ctx;
-  if (imageData != undefined) {
+  if (imageData !== undefined) {
     imageData.data ? data = imageData.data : data = imageData;
   }
   canvas = document.createElement("canvas");
@@ -34,22 +34,22 @@ EC.prototype.createCanvas = function( width, height, imageData, ox, oy ) {
   ctx.putImageData( imageData, ox, oy );
   this.canvas = canvas;
   this.ctx = ctx;
-}
+};
 
 EC.prototype.setCanvas = function( foreignCanvas ) {
   this.canvas = foreignCanvas;
   this.ctx = foreignCanvas.getContext("2d");
-}
+};
 
 EC.prototype.resize = function(width, height) {
   this.canvas.width = width;
   this.canvas.heght = height;
-}
+};
 
 EC.prototype.resizeTo = function(element) {
   this.canvas.width = element.offsetWidth;
   this.canvas.height = element.offsetHeight;
-}
+};
 
 EC.prototype.styleAsBackground = function(parent, image) {
   this.canvas.style.position = "absolute";
@@ -60,7 +60,7 @@ EC.prototype.styleAsBackground = function(parent, image) {
   if (image !== undefined) {
     this.drawCover(image);
   }
-}
+};
 
 EC.prototype.createCanvasAndResizeTo = function(imageData, ox, oy) {
   var canvasParent = this.canvas.parentNode,
@@ -71,28 +71,28 @@ EC.prototype.createCanvasAndResizeTo = function(imageData, ox, oy) {
               ,imageData
               ,ox
               ,oy);
-}
+};
 
 EC.prototype.putImageData = function(imageData, x, y) {
   this.ctx.putImageData(imageData, x, y);
   this.imageData = imageData;
-}
+};
 
 EC.prototype.cacheImageData = function() {
   this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-}
+};
 
 EC.prototype.drawImage = function(image, x, y) {
   this.ctx.drawImage(image, x, y);
   this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-}
+};
 
 EC.prototype.draw = function(image) {
   this.ctx.drawImage(image, 0, 0);
   this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-}
+};
 
-EC.prototype.getDimensions(element) {
+EC.prototype.getDimensions = function(element) {
   if (element.nodeName === "IMG") {
     return {width  : element.naturalWidth
            ,height : element.naturalHeight};
@@ -101,38 +101,39 @@ EC.prototype.getDimensions(element) {
     return {width  : element.width
            ,height : element.height};
   }
-}
+};
 
-EC.prototype.getAspectRatio(element) {
+EC.prototype.getAspectRatio = function(element) {
   dims = getDimensions(element);
   return dims.width / dims.height;
-}
+};
 
-EC.prototype.drawCoverP(canvas, image) {
+EC.prototype.drawCoverP = function(canvas, image) {
   var ctx          = canvas.getContext("2d"),
       canvasDims   = getDimensions(canvas),
       imageDims    = getDimensions(image),
       aspectCanvas = getAspectRatio(canvas),
-      aspectImage  = getAspectRatio(image);
+      aspectImage  = getAspectRatio(image),
+      offset;
   if ( aspectImage > aspectCanvas) {
-      var scaledWidth = ( imgDims.width * ( canvasDims.height / imgDims.height ) ),
-          offset      = ( canvasDims.width - scaledWidth ) / 2;
+      var scaledWidth = (imgDims.width * ( canvasDims.height / imgDims.height)),
+          offset      = (canvasDims.width - scaledWidth) / 2;
       ctx.drawImage( img, offset, 0, scaledWidth, canvasDims.height );
   } else if ( aspectImage < aspectCanvas ) {
-      var scaledHeight = ( imgDims.height * ( canvasDims.width / imgDims.width ) ),
-          offset       = ( canvasDims.height - scaledHeight ) / 2;
-      ctx.drawImage( img, 0, offset, canvasDims.width, scaledHeight );
+      var scaledHeight = (imgDims.height * (canvasDims.width / imgDims.width)),
+          offset       = (canvasDims.height - scaledHeight) / 2;
+      ctx.drawImage(img, 0, offset, canvasDims.width, scaledHeight);
   } else {
-      ctx.drawImage( img, 0, 0, canvasDims.width, canvasDims.height );
+      ctx.drawImage(img, 0, 0, canvasDims.width, canvasDims.height);
   }
-}
+};
 
 EC.prototype.drawCover = function(image) {
   drawCoverP( this.canvas, img );
   this.imageData = this.ctx.getImageData( 0, 0, this.canvas.width, this.canvas.height );
-}
+};
 
-EC.prototype.createRoundedRect(ctx, x, y, width, height, radius) {
+EC.prototype.createRoundedRect = function(ctx, x, y, width, height, radius) {
   var tlh = { x : x + radius, y : y + radius },
       trh = { x : x + width - radius, y : y + radius },
       brh = { x : x + width - radius, y : y + height - radius },
@@ -149,11 +150,11 @@ EC.prototype.createRoundedRect(ctx, x, y, width, height, radius) {
   ctx.lineTo( x, trh.y );
   ctx.arc( tlh.x, tlh.y, radius, Math.PI, Math.PI * 1.5 );
   ctx.closePath();
-}
+};
 
 EC.prototype.saturateP = function(imageData, satVal, width, height) {
     var data;
-    imageData.data ? data = imageData.data : data = imageData;
+    data = imageData.data || imageData;
     var area;
     var lumR = ( 1 - satVal ) * 0.3,
         lumG = ( 1 - satVal ) * 0.6,
@@ -161,9 +162,11 @@ EC.prototype.saturateP = function(imageData, satVal, width, height) {
     var r, g, b;
     // A marginal performance increase exists if the
     // height and width values are passed in directly
-    ( width === undefined && height === undefined   ) ? 
-    area = data.length / 4 : 
-    area = width * height;
+    if ( width === undefined && height === undefined ) {
+      area = data.length / 4;
+    } else {
+      area = width * height;
+    }
 
     for ( var i = 0; i < area; i++ ) {
         var j = i << 2;
@@ -175,14 +178,14 @@ EC.prototype.saturateP = function(imageData, satVal, width, height) {
         data[j + 2] = ( lumR * r ) + ( lumG * g ) + (( lumB + satVal) * b );
     }
     return imageData;
-}
+};
 
 EC.prototype.saturate = function(satVal, width, height) {
   var id = this.saturateP( this.imageData, satVal, width, height );
   this.ctx.putImageData( id, 0, 0 );
-}
+};
 
-EC.prototype.contrastP(imageData, contrast) {
+EC.prototype.contrastP = function(imageData, contrast) {
   var data = imageData.data;
   var factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
   for(var i=0;i<data.length;i+=4) {
@@ -191,12 +194,12 @@ EC.prototype.contrastP(imageData, contrast) {
       data[i+2] = factor * (data[i+2] - 128) + 128;
   }
   return imageData;
-}
+};
 
 EC.prototype.contrast = function( contrastVal ) {
   var id = this.contrastP( this.imageData, contrastVal );
   this.ctx.putImageData( id, 0, 0 );
-}
+};
 
 EC.prototype.blur = function(blurtype, radius) {
   var canvas = this.canvas;
@@ -205,9 +208,9 @@ EC.prototype.blur = function(blurtype, radius) {
       this.ctx.putImageData( imda.id, 0, 0 );
       this.imageData = imda.id;
   }
-}
+};
 
-EC.prototype.lightenP(imageData, lightnessVal) {
+EC.prototype.lightenP = function(imageData, lightnessVal) {
   var data = imageData.data;
   for (var i = 0; i < data.length; i += 4) {
       data[i] += lightnessVal;
@@ -215,9 +218,9 @@ EC.prototype.lightenP(imageData, lightnessVal) {
       data[i+2] += lightnessVal;
   }
   return imageData;
-}
+};
 
 EC.prototype.lighten = function(lightnessVal) {
   var id = this.lightenP(this.imageData,lightnessVal);
   this.ctx.putImageData(id, 0, 0);
-}
+};
