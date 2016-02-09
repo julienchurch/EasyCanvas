@@ -81,8 +81,7 @@ var StraylightUI = ( function() {
                , dx      : dx
                , dy      : dy
                , dWidth  : dWidth
-               , dHeight : dHeight
-               };
+               , dHeight : dHeight };
     }
 
     function styleAsOverlay( canvas ) {

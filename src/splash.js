@@ -29,7 +29,7 @@ window.addEventListener("load", function() {
     // This function pulls the animation from the covernav
     var removeCoverNavAnim = setTimeout( function() {
         var compensators = Array.prototype.slice.call( document.getElementsByClassName("compensator") );
-        for ( c in compensators ) {
+        for ( var c in compensators ) {
             classie.add( compensators[c], "loaded" );
         }
         clearTimeout( removeCoverNavAnim );

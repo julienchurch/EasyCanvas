@@ -1,7 +1,0 @@
-TODO:
-
-StraylightUI
-
-Change the createBlurredOverlay function to createOverlay, ripping out the blurring part and using it as a standalone function. This will allow you to use any image to pass in any image, not just an unblurred one (pre-blurred window.UICanvas becomes way too blurry).
-
-Also change the division-by-8 to a scaling factor function that takes into account the width of the destination / width of the source image. It's currently hardcoded to 8, which should work for most of my stuff, but as soon as I pass in something that's not that exact ratio, things will get wonky and I won't know why
