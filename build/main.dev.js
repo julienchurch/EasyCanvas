@@ -25,7 +25,7 @@ EC.prototype.createCanvas = function( width, height, imageData, ox, oy ) {
       canvas,
       ctx;
   if (imageData !== undefined) {
-    imageData.data ? data = imageData.data : data = imageData;
+    data = imageData.data || imageData;
   }
   canvas = document.createElement("canvas");
   ctx    = canvas.getContext("2d");
@@ -114,14 +114,15 @@ EC.prototype.drawCoverP = function(canvas, image) {
       imageDims    = getDimensions(image),
       aspectCanvas = getAspectRatio(canvas),
       aspectImage  = getAspectRatio(image),
-      offset;
+      offset,
+      scaledWidth;
   if ( aspectImage > aspectCanvas) {
-      var scaledWidth = (imgDims.width * ( canvasDims.height / imgDims.height)),
-          offset      = (canvasDims.width - scaledWidth) / 2;
+      scaledWidth = (imgDims.width * ( canvasDims.height / imgDims.height));
+      offset      = (canvasDims.width - scaledWidth) / 2;
       ctx.drawImage( img, offset, 0, scaledWidth, canvasDims.height );
   } else if ( aspectImage < aspectCanvas ) {
-      var scaledHeight = (imgDims.height * (canvasDims.width / imgDims.width)),
-          offset       = (canvasDims.height - scaledHeight) / 2;
+      scaledHeight = (imgDims.height * (canvasDims.width / imgDims.width));
+      offset       = (canvasDims.height - scaledHeight) / 2;
       ctx.drawImage(img, 0, offset, canvasDims.width, scaledHeight);
   } else {
       ctx.drawImage(img, 0, 0, canvasDims.width, canvasDims.height);
@@ -225,3 +226,5 @@ EC.prototype.lighten = function(lightnessVal) {
   this.ctx.putImageData(id, 0, 0);
 };
 
+var whatever = new EC();
+console.log(whatever);
