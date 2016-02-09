@@ -11,10 +11,16 @@ gulp.task('js-hint', function() {
       .pipe(jshint.reporter(stylish));
 });
 
-gulp.task('js-compile_src', function() {
+gulp.task('js-compile_src-pro', function() {
   gulp.src('src/*.js')
       .pipe(concat('main.js'))
       .pipe(uglify())
+      .pipe(gulp.dest('./build'))
+});
+
+gulp.task('js-compile_src-dev', function() {
+  gulp.src('src/*.js')
+      .pipe(concat('main.dev.js'))
       .pipe(gulp.dest('./build'))
 });
 
@@ -27,12 +33,14 @@ gulp.task('js-compile_vendor', function() {
 
 gulp.task('watch', function() {
 gulp.watch('src/*.js', ['js-hint'
-                       ,'js-compile_src'
+                       ,'js-compile_src-dev'
+                       ,'js-compile_src-pro'
                        ,'js-compile_vendor']);
 });
 
 gulp.task('default', ['js-hint'
-                     ,'js-compile_src'
+                     ,'js-compile_src-dev'
+                     ,'js-compile_src-pro'
                      ,'js-compile_vendor'
                      ,'watch']);
   
