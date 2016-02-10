@@ -27,15 +27,25 @@ LightFX.prototype.replaceCanvas = function(foreignCanvas) {
   this.ctx = foreignCanvas.getContext("2d");
 };
 
+LightFX.prototype._createTempCanvas = function() {
+  var canvas = document.createElement("canvas"),
+      ctx = canvas.getContext("2d");
+  return { canvas : canvas
+         , ctx : ctx };
+};
+
 LightFX.prototype.resize = function(width, height) {
   this.canvas.width = width;
   this.canvas.heght = height;
 };
 
+LightFX.prototype._resizeTo = function(canvas, element) {
+  canvas.width  = element.offsetWidth || element.naturalWidth || element.width;
+  canvas.height = element.offsetHeight || element.naturalHeight || element.height;
+};
+
 LightFX.prototype.resizeTo = function(element) {
-  this.canvas.width = element.offsetWidth || element.naturalWidth;
-  this.canvas.height = element.offsetHeight || element.naturalHeight;
-  console.log(element.offsetWidth, element.naturalWidth);
+  this._resizeTo(this.canvas, element);
 };
 
 LightFX.prototype.styleAsBackground = function(parent, image) {
@@ -116,11 +126,11 @@ LightFX.prototype._drawCover = function(canvas, image) {
       offset,
       scaledWidth;
   if ( aspectImage > aspectCanvas) {
-    scaledWidth = (imgDims.width * ( canvasDims.height / imgDims.height));
+    scaledWidth = (imageDims.width * ( canvasDims.height / imageDims.height));
     offset      = (canvasDims.width - scaledWidth) / 2;
-    ctx.drawImage( img, offset, 0, scaledWidth, canvasDims.height );
-  } else if ( aspectImage < aspectCanvas ) {
-    scaledHeight = (imgDims.height * (canvasDims.width / imgDims.width));
+    ctx.drawImage(image, offset, 0, scaledWidth, canvasDims.height);
+  } else if (aspectImage < aspectCanvas) {
+    scaledHeight = (imageDims.height * (canvasDims.width / imageDims.width));
     offset       = (canvasDims.height - scaledHeight) / 2;
     ctx.drawImage(image, 0, offset, canvasDims.width, scaledHeight);
   } else {
@@ -224,50 +234,82 @@ LightFX.prototype.lightness = function(lightnessVal) {
   this.ctx.putImageData(id, 0, 0);
 };
 
-LightFX.prototype._createBlurStack = function() {
-  if ( blurMethod === "stackblur" ) {
-    var scaledCanvas = new EasyCanvas(),
-        stack = [ clone ];
-    scaledCanvas.canvas.width = this.canvas.width / 8 | 0;
-    scaledCanvas.canvas.height = this.canvas.height / 8 | 0;
-    scaledCanvas.ctx.drawImage( this.canvas,
-                                0,
-                                0,
-                                scaledCanvas.canvas.width,
-                                scaledCanvas.canvas.height );
-    scaledCanvas.cacheImageData();
+LightFX.prototype._quickblur = function(canvas, radius) {
+  var scaled = this._createTempCanvas(),
+      blurryImageData,
+      blurry,
+      output;
+  scaled.canvas.width = canvas.width / 8 | 0;
+  scaled.canvas.height = canvas.height / 8 | 0;
+  scaled.ctx.drawImage(canvas
+                      ,0
+                      ,0
+                      ,scaled.canvas.width
+                      ,scaled.canvas.height);
+  blurryImageData = stackBlurCanvasRGB(scaled.canvas
+                                      ,0
+                                      ,0
+                                      ,scaled.canvas.width
+                                      ,scaled.canvas.height
+                                      ,radius / 8 | 0).id;
+  blurry = this._createTempCanvas();
+  this._resizeTo(blurry.canvas, scaled.canvas);
+  blurry.ctx.putImageData(blurryImageData, 0, 0);
+  output = this._createTempCanvas();
+  this._resizeTo(output.canvas, canvas);
+  output.ctx.drawImage(blurry.canvas
+                      ,0
+                      ,0
+                      ,blurry.canvas.width * 8
+                      ,blurry.canvas.height * 8);
+  return output.canvas;
+};
 
-    // Why 6? It just seems to look nice.
-    for ( i = 1; i < 6; i ++ ) {
-        var iterationRadius;
-        if (((radius / 8 | 0) / 6) * i < 1) {
-          iterationRadius = 1;  
-        } else {
-          iterationRadius = ((radius / 8) / 6) * i;
-        }
+LightFX.prototype.quickblur = function(radius) {
+  console.log(this.canvas);
+  return this._quickblur(this.canvas, radius);
+};
 
-        var blurryImageData = stackBlurCanvasRGB( scaledCanvas.canvas, 
-                                                  0,
-                                                  0,
-                                                  scaledCanvas.canvas.width,
-                                                  scaledCanvas.canvas.height,
-                                                  iterationRadius ).id;
-        stack[i]        = new EasyCanvas();
-        stack[i].width  = scaledCanvas.canvas.width;
-        stack[i].height = scaledCanvas.canvas.height;
-        stack[i].ctx.putImageData( blurryImageData, 0, 0 );
-        stack[i].cacheImageData();
-        stack[i].blurLayerId = i;
+LightFX.prototype._createBlurStack = function(canvas, radius) {
+  var scaled = this._createTempCanvas(),
+      stack        = [ this.canvas ],
+      iterationRadius,
+      blurryImageData,
+      blurry;
+  // Why 8? Honestly, I don't have a reason. But it looks good.
+  // Monkeycode. TODO: figure out how to improve.
+  scaled.canvas.width  = canvas.width  / 8 | 0;
+  scaled.canvas.height = canvas.height / 8 | 0;
+  scaled.ctx.drawImage(canvas
+                      ,0
+                      ,0
+                      ,scaled.canvas.width
+                      ,scaled.canvas.height);
+  for (var i = 1; i < 6; i++) {
+    if (((radius / 8 | 0) / 6) * i < 1) {
+      console.log(true);
+      iterationRadius = 1;  
+    } else {
+      iterationRadius = ((radius / 8) / 6) * i;
+      console.log(iterationRadius);
     }
-    blurStack = stack;
+    blurryImageData = stackBlurCanvasRGB(scaled.canvas
+                                        ,0
+                                        ,0
+                                        ,scaled.canvas.width
+                                        ,scaled.canvas.height
+                                        ,iterationRadius).id;
+    blurry = this._createTempCanvas();
+    this._resizeTo(blurry.canvas, scaled.canvas);
+    blurry.ctx.putImageData(blurryImageData, 0, 0);
+    console.log(iterationRadius);
+    document.body.appendChild(blurry.canvas);
+    stack.push(blurry.canvas);
+    stack[i].blurLayerId = i;
   }
+  return stack;
 };
 
-LightFX.prototype._quickblur = function(canvas) {
-};
-
-LightFX.prototype._createBlurStack$ = function() {
-};
-
-LightFX.prototype.createBlurStack = function() {
+LightFX.prototype.createBlurStack = function(radius) {
+  return this._createBlurStack(this.canvas, radius);
 };
