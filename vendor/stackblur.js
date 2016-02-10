@@ -369,36 +369,13 @@ function stackBlurCanvasRGBA( id, top_x, top_y, width, height, radius )
 }
 
 
-function stackBlurCanvasRGB( canvas, top_x, top_y, width, height, radius )
+function stackBlurCanvasRGB(canvas, top_x, top_y, width, height, radius)
 {
     if ( isNaN(radius) || radius < 1 ) return;
     radius |= 0;
     
     var context = canvas.getContext("2d");
-    var imageData;
-    
-    try {
-      try {
-        imageData = context.getImageData( top_x, top_y, width, height );
-      } catch(e) {
-      
-        // NOTE: this part is supposedly only needed if you want to work with local files
-        // so it might be okay to remove the whole try/catch block and just use
-        // imageData = context.getImageData( top_x, top_y, width, height );
-        try {
-            netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
-            imageData = context.getImageData( top_x, top_y, width, height );
-        } catch(e) {
-            alert("Cannot access local image");
-            throw new Error("unable to access local image data: " + e);
-            return;
-        }
-      }
-    } catch(e) {
-      alert("Cannot access image");
-      throw new Error("unable to access image data: " + e);
-    }
-            
+    var imageData = context.getImageData(top_x, top_y, width, height);
     var pixels = imageData.data;
             
     var x, y, i, p, yp, yi, yw, r_sum, g_sum, b_sum,
@@ -411,7 +388,7 @@ function stackBlurCanvasRGB( canvas, top_x, top_y, width, height, radius )
     var widthMinus1  = width - 1;
     var heightMinus1 = height - 1;
     var radiusPlus1  = radius + 1;
-    var sumFactor = radiusPlus1 * ( radiusPlus1 + 1 ) / 2;
+    var sumFactor = radiusPlus1 * (radiusPlus1 + 1) / 2;
     
     var stackStart = new BlurStack();
     var stack = stackStart;
