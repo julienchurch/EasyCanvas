@@ -152,31 +152,31 @@ LightCanvas.prototype.createRoundedRect = function(ctx, x, y, width, height, rad
 };
 
 LightCanvas.prototype.saturateP = function(imageData, satVal, width, height) {
-    var data;
-    data = imageData.data || imageData;
-    var area;
-    var lumR = (1 - satVal) * 0.3,
-        lumG = (1 - satVal) * 0.6,
-        lumB = (1 - satVal) * 0.1;
-    var r, g, b;
-    // A marginal performance increase exists if the
-    // height and width values are passed in directly
-    if ( width === undefined && height === undefined ) {
-      area = data.length / 4;
-    } else {
-      area = width * height;
-    }
+  var data;
+  data = imageData.data || imageData;
+  var area;
+  var lumR = (1 - satVal) * 0.3,
+      lumG = (1 - satVal) * 0.6,
+      lumB = (1 - satVal) * 0.1;
+  var r, g, b;
+  // A marginal performance increase exists if the
+  // height and width values are passed in directly
+  if ( width === undefined && height === undefined ) {
+    area = data.length / 4;
+  } else {
+    area = width * height;
+  }
 
-    for (var i = 0; i < area; i++) {
-      var j = i << 2;
-      r = data[j];
-      g = data[j + 1];
-      b = data[j + 2];
-      data[j] = ((lumR + satVal) * r) + (lumG * g) + (lumB * b);
-      data[j + 1] = (lumR * r) + ((lumG + satVal) * g) + (lumB * b);
-      data[j + 2] = (lumR * r) + (lumG * g) + ((lumB + satVal) * b);
-    }
-    return imageData;
+  for (var i = 0; i < area; i++) {
+    var j = i << 2;
+    r = data[j];
+    g = data[j + 1];
+    b = data[j + 2];
+    data[j] = ((lumR + satVal) * r) + (lumG * g) + (lumB * b);
+    data[j + 1] = (lumR * r) + ((lumG + satVal) * g) + (lumB * b);
+    data[j + 2] = (lumR * r) + (lumG * g) + ((lumB + satVal) * b);
+  }
+  return imageData;
 };
 
 LightCanvas.prototype.saturate = function(satVal, width, height) {
