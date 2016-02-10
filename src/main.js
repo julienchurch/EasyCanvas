@@ -1,10 +1,25 @@
+function qblur(img) {
+  for (var i=0; i<30; i++) {
+    var quickblur = new LightFX();
+    quickblur.resizeTo(img);
+    quickblur.drawCover(img);
+    var qbb = quickblur.quickblur(40);
+    document.body.appendChild(qbb);
+  }
+}
+
+function sblur(img) {
+  for (var i=0; i<30; i++) {
+    var stackblur = new LightFX();
+    stackblur.resizeTo(img);
+    stackblur.drawCover(img);
+    stackblur.blur("stackblur", 40);
+    document.body.appendChild(stackblur.canvas);
+  }
+}
+
 window.addEventListener("load", function() {
-  var sCanvas = new LightFX(),
-      sImage = document.getElementById("blue_lumen");
-  sCanvas.resizeTo(sImage);
-  sCanvas.drawCover(sImage);
-  sCanvas.contrast(30);
-  sCanvas.lightness(-40);
-  sCanvas.blur("stackblur", 90);
-  document.body.appendChild(sCanvas.canvas);
+  var img = document.getElementById("image");
+  // sblur(img);
+  qblur(img);
 });
