@@ -35,13 +35,11 @@ gulp.task('js-compile_vendor', function() {
 gulp.task('watch', function() {
 gulp.watch('src/*.js', ['js-hint'
                        ,'js-compile_src-dev'
-                       ,'js-compile_src-pro'
                        ,'js-compile_vendor']);
 });
 
 gulp.task('default', ['js-hint'
                      ,'js-compile_src-dev'
-                     ,'js-compile_src-pro'
                      ,'js-compile_vendor'
                      ,'watch']);
   
