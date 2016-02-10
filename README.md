@@ -1,5 +1,6 @@
 # LightFX 
 
-## A complete mess at the moment.
+## An (unfinished) library for adding HTML5 canvas UI effects 
 
-As it stands, this is a whole bunch of completely unorganized, disparate, and ugly old code that I have to run through and turn into a library. Buried somewhere within here, though, are a handful of good image manipulation algorithms I stole.
+Somewhere within this mess of files are some sick UI effects alongside some very efficient image manipulation algorithms I stole.
+
