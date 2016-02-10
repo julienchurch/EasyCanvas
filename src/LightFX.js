@@ -1,18 +1,3 @@
-// This is actually pretty useful and almost kinda sorta well written.
-// I mean, at least the API is decent.
-// Somewhere in here I reimplemented `drawImage` and `putImageData`,
-// which was a dumb idea. The thought was good, but to make the API
-// consistent/intuitive I'd have to judiciously reimplement all the
-// 2d context methods and hope that no one called a native method on 
-// `ctx` because if they did they'd probs end up very confused.
-// The intent was to make them accessible without calling them on `ctx`
-// (easier) and to modify or add imageData each time they were called in
-// order to sync everything up right (easier and less error prone).
-// I think instead of that there should be a `cacheImageData` method
-// which is more explicit and meaningful than the current `setImageData`
-// method, and then the filter methods should first look to the `imageData`
-// property as the cache and fall back on pulling the image data directly
-// from the context (which, I imagine, has a performance penalty).
 function LightFX() {
   this.canvas = document.createElement("canvas");
   this.ctx = this.canvas.getContext("2d");
@@ -48,8 +33,9 @@ LightFX.prototype.resize = function(width, height) {
 };
 
 LightFX.prototype.resizeTo = function(element) {
-  this.canvas.width = element.offsetWidth;
-  this.canvas.height = element.offsetHeight;
+  this.canvas.width = element.offsetWidth || element.naturalWidth;
+  this.canvas.height = element.offsetHeight || element.naturalHeight;
+  console.log(element.offsetWidth, element.naturalWidth);
 };
 
 LightFX.prototype.styleAsBackground = function(parent, image) {
@@ -113,16 +99,20 @@ LightFX.prototype.getDimensions = function(element) {
 };
 
 LightFX.prototype.getAspectRatio = function(element) {
-  dims = getDimensions(element);
+  dims = this.getDimensions(element);
   return dims.width / dims.height;
 };
 
-LightFX.prototype.drawCoverP = function(canvas, image) {
+// Methods prefixed with an underscore are loosely coupled and preserved
+// in the case that they may need to be called elsewhere. The canvas is
+// therefore parameterized here, and passed in by the public drawCover 
+// API
+LightFX.prototype._drawCover = function(canvas, image) {
   var ctx          = canvas.getContext("2d"),
-      canvasDims   = getDimensions(canvas),
-      imageDims    = getDimensions(image),
-      aspectCanvas = getAspectRatio(canvas),
-      aspectImage  = getAspectRatio(image),
+      canvasDims   = this.getDimensions(canvas),
+      imageDims    = this.getDimensions(image),
+      aspectCanvas = this.getAspectRatio(canvas),
+      aspectImage  = this.getAspectRatio(image),
       offset,
       scaledWidth;
   if ( aspectImage > aspectCanvas) {
@@ -132,14 +122,14 @@ LightFX.prototype.drawCoverP = function(canvas, image) {
   } else if ( aspectImage < aspectCanvas ) {
     scaledHeight = (imgDims.height * (canvasDims.width / imgDims.width));
     offset       = (canvasDims.height - scaledHeight) / 2;
-    ctx.drawImage(img, 0, offset, canvasDims.width, scaledHeight);
+    ctx.drawImage(image, 0, offset, canvasDims.width, scaledHeight);
   } else {
-    ctx.drawImage(img, 0, 0, canvasDims.width, canvasDims.height);
+    ctx.drawImage(image, 0, 0, canvasDims.width, canvasDims.height);
   }
 };
 
 LightFX.prototype.drawCover = function(image) {
-  drawCoverP(this.canvas, img);
+  this._drawCover(this.canvas, image);
   this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
 };
 
@@ -195,7 +185,7 @@ LightFX.prototype.saturate = function(satVal, width, height) {
   this.ctx.putImageData(id, 0, 0);
 };
 
-LightFX.prototype.contrastP = function(imageData, contrast) {
+LightFX.prototype._contrast = function(imageData, contrast) {
   var data = imageData.data;
   var factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
   for(var i=0;i<data.length;i+=4) {
@@ -207,7 +197,7 @@ LightFX.prototype.contrastP = function(imageData, contrast) {
 };
 
 LightFX.prototype.contrast = function(contrastVal) {
-  var id = this.contrastP(this.imageData, contrastVal);
+  var id = this._contrast(this.getImageData(), contrastVal);
   this.ctx.putImageData(id, 0, 0);
 };
 
@@ -216,11 +206,10 @@ LightFX.prototype.blur = function(blurtype, radius) {
   if (blurtype === "stackblur") {
     var imda = stackBlurCanvasRGB(canvas, 0, 0, canvas.width, canvas.height, radius);
     this.ctx.putImageData(imda.id, 0, 0);
-    this.imageData = imda.id;
   }
 };
 
-LightFX.prototype.lightenP = function(imageData, lightnessVal) {
+LightFX.prototype._lightness = function(imageData, lightnessVal) {
   var data = imageData.data;
   for (var i = 0; i < data.length; i += 4) {
     data[i] += lightnessVal;
@@ -230,7 +219,55 @@ LightFX.prototype.lightenP = function(imageData, lightnessVal) {
   return imageData;
 };
 
-LightFX.prototype.lighten = function(lightnessVal) {
-  var id = this.lightenP(this.imageData,lightnessVal);
+LightFX.prototype.lightness = function(lightnessVal) {
+  var id = this._lightness(this.imageData,lightnessVal);
   this.ctx.putImageData(id, 0, 0);
+};
+
+LightFX.prototype._createBlurStack = function() {
+  if ( blurMethod === "stackblur" ) {
+    var scaledCanvas = new EasyCanvas(),
+        stack = [ clone ];
+    scaledCanvas.canvas.width = this.canvas.width / 8 | 0;
+    scaledCanvas.canvas.height = this.canvas.height / 8 | 0;
+    scaledCanvas.ctx.drawImage( this.canvas,
+                                0,
+                                0,
+                                scaledCanvas.canvas.width,
+                                scaledCanvas.canvas.height );
+    scaledCanvas.cacheImageData();
+
+    // Why 6? It just seems to look nice.
+    for ( i = 1; i < 6; i ++ ) {
+        var iterationRadius;
+        if (((radius / 8 | 0) / 6) * i < 1) {
+          iterationRadius = 1;  
+        } else {
+          iterationRadius = ((radius / 8) / 6) * i;
+        }
+
+        var blurryImageData = stackBlurCanvasRGB( scaledCanvas.canvas, 
+                                                  0,
+                                                  0,
+                                                  scaledCanvas.canvas.width,
+                                                  scaledCanvas.canvas.height,
+                                                  iterationRadius ).id;
+        stack[i]        = new EasyCanvas();
+        stack[i].width  = scaledCanvas.canvas.width;
+        stack[i].height = scaledCanvas.canvas.height;
+        stack[i].ctx.putImageData( blurryImageData, 0, 0 );
+        stack[i].cacheImageData();
+        stack[i].blurLayerId = i;
+    }
+    blurStack = stack;
+  }
+};
+
+LightFX.prototype._quickblur = function(canvas) {
+};
+
+LightFX.prototype._createBlurStack$ = function() {
+};
+
+LightFX.prototype.createBlurStack = function() {
 };
