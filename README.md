@@ -65,19 +65,19 @@ Runs the highly-efficient stackblur algorithm over the canvas.
 **lightblur(radius)**  
 Runs the even-more-highly-efficient lightblur algorithm over the canvas.  
 
-**lightness(lightnessValue)**  
+**lightness(lightnessValue)**   
 Increase or decrease lightness linearly (accepts range -255 to +255)  
 
 **contras(contrastValue)**  
 Increase or decrase contrast (accepts range -100 to +100)  
 
-**saturation(saturationValue)**
+**saturation(saturationValue)**  
 Increase or decrase saturation (accepts range -255 to +255)
 
-**blurIn(framerate, radius)**
+**blurIn(framerate, radius)**  
 Uses the `lightblur` algorithm to animate a blurring in of the image to the specified radius
 
-**blurOut(framerate, radius)**
+**blurOut(framerate, radius)**  
 Uses the `lightblur` algorithm to animate a blurring out of the the image from the specified radius
 
 ## More to come
