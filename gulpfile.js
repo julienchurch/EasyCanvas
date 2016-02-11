@@ -14,14 +14,14 @@ gulp.task('js-hint', function() {
 
 gulp.task('js-compile_src-pro', function() {
   gulp.src('src/*.js')
-      .pipe(concat('main.js'))
+      .pipe(concat('LightFX.js'))
       .pipe(uglify())
       .pipe(gulp.dest('./build'))
 });
 
 gulp.task('js-compile_src-dev', function() {
   gulp.src('src/*.js')
-      .pipe(concat('main.dev.js'))
+      .pipe(concat('LightFX.dev.js'))
       .pipe(gulp.dest('./build'))
 });
 
@@ -34,11 +34,13 @@ gulp.task('js-compile_vendor', function() {
 
 gulp.task('watch', function() {
 gulp.watch('src/*.js', ['js-hint'
+                       ,'js-compile_src-pro'
                        ,'js-compile_src-dev'
                        ,'js-compile_vendor']);
 });
 
 gulp.task('default', ['js-hint'
+                     ,'js-compile_src-pro'
                      ,'js-compile_src-dev'
                      ,'js-compile_vendor'
                      ,'watch']);
