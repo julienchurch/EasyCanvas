@@ -1,9 +1,11 @@
 function LightFX(image) {
   this.canvas = document.createElement("canvas");
+  this.canvas.id = "main";
   this.ctx = this.canvas.getContext("2d");
   this.tempCanvas = undefined;
   this.imageData = undefined;
   this.cachedImageData = undefined;
+  this.blurStack = undefined;
   this._init(image);
 }
 
@@ -32,6 +34,14 @@ LightFX.prototype.createCanvas = function(width, height, imageData, ox, oy) {
   ctx.putImageData(imageData, ox, oy);
   this.canvas = canvas;
   this.ctx = ctx;
+};
+
+LightFX.prototype._cloneCanvas = function(origin) {
+  var clone = this._createTempCanvas();
+  clone.canvas.width = origin.width;
+  clone.canvas.height = origin.height;
+  clone.ctx.drawImage(origin, 0, 0);
+  return clone.canvas;
 };
 
 LightFX.prototype.replaceCanvas = function(foreignCanvas) {
@@ -290,7 +300,7 @@ LightFX.prototype.lightness = function(lightnessVal) {
 
 LightFX.prototype._createBlurStack = function(canvas, radius) {
   var scaled = this._createTempCanvas(),
-      stack        = [ this.canvas ],
+      stack        = [this._cloneCanvas(this.canvas)],
       iterationRadius,
       blurryImageData,
       blurry;
@@ -305,11 +315,9 @@ LightFX.prototype._createBlurStack = function(canvas, radius) {
                       ,scaled.canvas.height);
   for (var i = 1; i < 6; i++) {
     if (((radius / 8 | 0) / 6) * i < 1) {
-      console.log(true);
       iterationRadius = 1;  
     } else {
       iterationRadius = ((radius / 8) / 6) * i;
-      console.log(iterationRadius);
     }
     blurryImageData = stackBlurCanvasRGB(scaled.canvas
                                         ,0
@@ -320,8 +328,6 @@ LightFX.prototype._createBlurStack = function(canvas, radius) {
     blurry = this._createTempCanvas();
     this._resizeTo(blurry.canvas, scaled.canvas);
     blurry.ctx.putImageData(blurryImageData, 0, 0);
-    console.log(iterationRadius);
-    document.body.appendChild(blurry.canvas);
     stack.push(blurry.canvas);
     stack[i].blurLayerId = i;
   }
@@ -331,3 +337,67 @@ LightFX.prototype._createBlurStack = function(canvas, radius) {
 LightFX.prototype.createBlurStack = function(radius) {
   return this._createBlurStack(this.canvas, radius);
 };
+
+LightFX.prototype.blurIn = function(speed, radius) {
+  if (! this.blurStack) {
+    this.blurStack = this._createBlurStack(this.canvas, radius);
+  }
+    // `i` is one because we can disregard stack[0], which is the original
+    // image data.
+  var LFX = this, 
+      i = 1,
+      // This `intervalSpeed` is broken; 4 should be `blurStack.length - 2`, I think
+      // but considering the performance of the function overall it might actually
+      // mess things up if I do it...
+      frameTransitions = LFX.blurStack.length - 2,
+      intervalSpeed = (speed / frameTransitions) | 0 ? 
+                      (speed / frameTransitions) | 0 :
+                      10;
+  var intervalId = setInterval( function() {
+    if (i < LFX.blurStack.length) {
+      // window.requestAnimationFrame(function() {
+        LFX.ctx.drawImage(LFX.blurStack[i]
+                         ,0
+                         ,0
+                          // Apparently this math has some trouble keeping
+                          // its shit together so I'm stretching it a teeny
+                          // bit with the +10
+                         ,LFX.blurStack[i].width * 8 + 10
+                         ,LFX.blurStack[i].height * 8 | 0);
+      // });
+      i++;
+    } else {
+      clearInterval(intervalId);  
+    }
+  }, intervalSpeed);
+};
+
+LightFX.prototype.blurOut = function(speed) {
+  if (! this.blurStack) {
+    this.blurStack = this._createBlurStack(this.canvas, radius);
+  }
+    // `i` is stack.length - 2 because we can disregard the last item in
+    // in the stack, which is the fully blurred image
+  var LFX = this, 
+      i = LFX.blurStack.length - 2,
+      frameTransitions = LFX.blurStack.length - 2,
+      intervalSpeed = (speed / frameTransitions) | 0 ? 
+                      (speed / frameTransitions) | 0 :
+                      10;
+  var intervalId = setInterval(function() {
+    if (i > 0) {
+        LFX.ctx.drawImage(LFX.blurStack[i]
+                             ,0
+                             ,0
+                             ,LFX.blurStack[i].width * 8 | 0
+                             ,LFX.blurStack[i].height * 8 | 0);
+        i--;
+    } else {
+      LFX.ctx.drawImage(LFX.blurStack[i]
+                       ,0
+                       ,0);
+      clearInterval(intervalId);
+    }
+  }, intervalSpeed);
+};
+
