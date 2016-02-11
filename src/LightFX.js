@@ -233,7 +233,7 @@ LightFX.prototype.stackblur = function(radius) {
   this.ctx.putImageData(imda, 0, 0);
 };
 
-LightFX.prototype._quickblur = function(canvas, radius) {
+LightFX.prototype._lightblur = function(canvas, radius) {
   var scaled = this._createTempCanvas(),
       blurryImageData,
       blurry,
@@ -267,8 +267,8 @@ LightFX.prototype._quickblur = function(canvas, radius) {
   return output.canvas;
 };
 
-LightFX.prototype.quickblur = function(radius) {
-  var imda = this._quickblur(this.canvas, radius);
+LightFX.prototype.lightblur = function(radius) {
+  var imda = this._lightblur(this.canvas, radius);
   this.canvas = imda;
   this.ctx = imda.getContext("2d");
 };
