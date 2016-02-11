@@ -18,14 +18,20 @@ function sblur(img) {
   }
 }
 
+function binmoid(t) {
+  return 255 / (1 + Math.pow(Math.E, -t));
+} 
+
+
 window.addEventListener("load", function() {
   var img = document.getElementById("image");
   var lblur = new LightFX(img);
-  lblur.lightblur(200);
-  lblur.contrast(20);
+  lblur.canvas.addEventListener("mouseenter", function() {
+    lblur.blurIn(150, 140);
+  });
+  lblur.canvas.addEventListener("mouseleave", function() {
+    lblur.blurOut(150, 140);
+  });
   var sblur = new LightFX(img);
-  sblur.stackblur(170);
-  sblur.contrast(20);
   document.body.appendChild(lblur.canvas);
-  document.body.appendChild(sblur.canvas);
 });
