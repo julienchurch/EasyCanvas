@@ -5,6 +5,7 @@ LightFX is a small library for adding canvas-based UI effects. It is not a canva
 Since it grew as a need-based, organic library of functions LightFX is very specific, and allows you to easily:
 
 * Add extremely-efficient gaussian-like blurs
+* Animate those blurs in and out
 * Adjust lightness
 * Adjust contrast
 * Adjust saturation
