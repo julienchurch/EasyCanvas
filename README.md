@@ -60,10 +60,10 @@ Of course, to actually *view* this change, you'll have to append `lfx.canvas` so
 Here are the currently-available methods on a LightFX object
 
 **stackblur(radius)**  
-Runs the highly-efficient stackblur algorithm over the canvas.  
+Run the highly-efficient stackblur algorithm over the canvas  
 
 **lightblur(radius)**  
-Runs the even-more-highly-efficient lightblur algorithm over the canvas.  
+Run the even-more-highly-efficient lightblur algorithm over the canvas  
 
 **lightness(lightnessValue)**   
 Increase or decrease lightness linearly (accepts range -255 to +255)  
@@ -75,10 +75,10 @@ Increase or decrase contrast (accepts range -100 to +100)
 Increase or decrase saturation (accepts range -255 to +255)
 
 **blurIn(framerate, radius)**  
-Uses the lightblur algorithm to animate a blurring in of the image to the specified radius
+Use the lightblur algorithm to animate a blurring in of the image to the specified radius
 
 **blurOut(framerate, radius)**  
-Uses the lightblur algorithm to animate a blurring out of the the image from the specified radius
+Use the lightblur algorithm to animate a blurring out of the the image from the specified radius
 
 ## More to come
 
