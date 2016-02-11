@@ -20,6 +20,12 @@ function sblur(img) {
 
 window.addEventListener("load", function() {
   var img = document.getElementById("image");
-  // sblur(img);
-  qblur(img);
+  var qblur = new LightFX(img);
+  qblur.quickblur(200);
+  qblur.contrast(20);
+  var sblur = new LightFX(img);
+  sblur.stackblur(170);
+  sblur.contrast(20);
+  document.body.appendChild(qblur.canvas);
+  document.body.appendChild(sblur.canvas);
 });

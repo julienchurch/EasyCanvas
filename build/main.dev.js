@@ -1,10 +1,22 @@
-function LightFX() {
+function LightFX(image) {
   this.canvas = document.createElement("canvas");
   this.ctx = this.canvas.getContext("2d");
   this.tempCanvas = undefined;
   this.imageData = undefined;
   this.cachedImageData = undefined;
+  this._init(image);
 }
+
+LightFX.prototype._init = function(image) {
+  if (image !== undefined) {
+    this._resizeTo(this.canvas, image);
+    this.ctx.drawImage(image
+                      ,0
+                      ,0
+                      ,this.canvas.width
+                      ,this.canvas.height);
+  }
+};
 
 LightFX.prototype.createCanvas = function(width, height, imageData, ox, oy) {
   var data,
@@ -30,8 +42,8 @@ LightFX.prototype.replaceCanvas = function(foreignCanvas) {
 LightFX.prototype._createTempCanvas = function() {
   var canvas = document.createElement("canvas"),
       ctx = canvas.getContext("2d");
-  return { canvas : canvas
-         , ctx : ctx };
+  return {canvas : canvas
+         ,ctx : ctx};
 };
 
 LightFX.prototype.resize = function(width, height) {
@@ -83,7 +95,7 @@ LightFX.prototype.cacheImageData = function() {
                                               ,this.canvas.height);
 };
 
-LightFX.prototype.getImageData = function() {
+LightFX.prototype._getImageData = function() {
   return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
 };
 
@@ -207,31 +219,18 @@ LightFX.prototype._contrast = function(imageData, contrast) {
 };
 
 LightFX.prototype.contrast = function(contrastVal) {
-  var id = this._contrast(this.getImageData(), contrastVal);
+  var id = this._contrast(this._getImageData(), contrastVal);
   this.ctx.putImageData(id, 0, 0);
 };
 
-LightFX.prototype.blur = function(blurtype, radius) {
-  var canvas = this.canvas;
-  if (blurtype === "stackblur") {
-    var imda = stackBlurCanvasRGB(canvas, 0, 0, canvas.width, canvas.height, radius);
-    this.ctx.putImageData(imda.id, 0, 0);
-  }
-};
-
-LightFX.prototype._lightness = function(imageData, lightnessVal) {
-  var data = imageData.data;
-  for (var i = 0; i < data.length; i += 4) {
-    data[i] += lightnessVal;
-    data[i+1] += lightnessVal;
-    data[i+2] += lightnessVal;
-  }
-  return imageData;
-};
-
-LightFX.prototype.lightness = function(lightnessVal) {
-  var id = this._lightness(this.imageData,lightnessVal);
-  this.ctx.putImageData(id, 0, 0);
+LightFX.prototype.stackblur = function(radius) {
+  var imda = stackBlurCanvasRGB(this.canvas
+                               ,0
+                               ,0
+                               ,this.canvas.width
+                               ,this.canvas.height
+                               ,radius).id;
+  this.ctx.putImageData(imda, 0, 0);
 };
 
 LightFX.prototype._quickblur = function(canvas, radius) {
@@ -262,12 +261,31 @@ LightFX.prototype._quickblur = function(canvas, radius) {
                       ,0
                       ,blurry.canvas.width * 8
                       ,blurry.canvas.height * 8);
+  // Returning canvas itself instead of image data
+  // because drawImage is supposed to be faster
+  // TODO: verify this claim
   return output.canvas;
 };
 
 LightFX.prototype.quickblur = function(radius) {
-  console.log(this.canvas);
-  return this._quickblur(this.canvas, radius);
+  var imda = this._quickblur(this.canvas, radius);
+  this.canvas = imda;
+  this.ctx = imda.getContext("2d");
+};
+
+LightFX.prototype._lightness = function(imageData, lightnessVal) {
+  var data = imageData.data;
+  for (var i = 0; i < data.length; i += 4) {
+    data[i] += lightnessVal;
+    data[i+1] += lightnessVal;
+    data[i+2] += lightnessVal;
+  }
+  return imageData;
+};
+
+LightFX.prototype.lightness = function(lightnessVal) {
+  var id = this._lightness(this._getImageData(),lightnessVal);
+  this.ctx.putImageData(id, 0, 0);
 };
 
 LightFX.prototype._createBlurStack = function(canvas, radius) {
@@ -336,6 +354,12 @@ function sblur(img) {
 
 window.addEventListener("load", function() {
   var img = document.getElementById("image");
-  // sblur(img);
-  qblur(img);
+  var qblur = new LightFX(img);
+  qblur.quickblur(200);
+  qblur.contrast(20);
+  var sblur = new LightFX(img);
+  sblur.stackblur(170);
+  sblur.contrast(20);
+  document.body.appendChild(qblur.canvas);
+  document.body.appendChild(sblur.canvas);
 });
