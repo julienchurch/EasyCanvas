@@ -23,12 +23,12 @@ Second, it also resolves the edge issue: when you blur an image with CSS, the al
 
     open -a 'Google Chrome' --args -allow-file-access-from-files
 
-I don't particularly recommend this. Instead, I prefer to run a simple python server:
+I don't particularly recommend this. Instead, I prefer to run a simple Python server:
 
     cd examples
     python -m SimpleHTTPServer
 
-This will satisfy the same origin policy, allowing canvas access to the files in this repository.
+This will satisfy the same origin policy, allowing canvas access to the example files in this repository.
 
 ### Example
 
