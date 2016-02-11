@@ -1,0 +1,1 @@
+../build/LightFX.dev.js
