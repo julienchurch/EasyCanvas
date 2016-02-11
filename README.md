@@ -13,7 +13,7 @@ Since it grew as a need-based, organic library of functions LightFX is very spec
 
 Well, there are a few reasons. 
 
-First, animating blurs with CSS/SVG tends to be unpredictable. I've noticed what is for lack of a better term, a "bounce": the blurring animation seemed to jump around is if were dropping frames at high speed. In the project that spawned this project, I was looking for a smooth, native-style blur. CSS just wasn't offering that.
+First, animating blurs with CSS/SVG tends to be unpredictable. I've noticed what is, for lack of a better term, a "bounce": the blurring animation seemed to jump around is if were dropping frames at high speed. In the project that spawned this project, I was looking for a smooth, native-style blur. CSS just wasn't offering that.
 
 Second, it also resolves the edge issue: when you blur an image with CSS, the alpha channel along the edges decreases as the edge feathers with the blur. This means the colors around the edge bleed in ways that aren't pretty and require unpleasant hacks to deal with.
 
@@ -21,12 +21,12 @@ Second, it also resolves the edge issue: when you blur an image with CSS, the al
 
 **Note:** If you're not running this code through the a server, your browser will complain about cross origin requests. In Chrome you can override this security measure with the command 
 
-open -a 'Google Chrome' --args -allow-file-access-from-files
+    open -a 'Google Chrome' --args -allow-file-access-from-files
 
 I don't particularly recommend this. Instead, I prefer to run a simple python server:
 
-cd examples
-python -m SimpleHTTPServer
+    cd examples
+    python -m SimpleHTTPServer
 
 This will satisfy the same origin policy, allowing canvas access to the files in this repository.
 
@@ -41,11 +41,15 @@ var lfx = new LightFX(img);
 
 This duplicates the image into a canvas of the same dimensions. From here, transforming is easy:
 
+```js
 lfx.lightblur(50); // 75-pixel pseudo-gassian blur based on stackblur
+```
 
 Boom. Done. You blurred it. How about lightness?
 
+```js
 lfx.lightness(100); // -255 to +255
+```
 
 Now your image is lighter. (Whoa!)
 
