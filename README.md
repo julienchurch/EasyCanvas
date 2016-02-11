@@ -51,31 +51,33 @@ Boom. Done. You blurred it. How about lightness?
 lfx.lightness(100); // -255 to +255
 ```
 
-Now your image is lighter. (Whoa!)
+Now your canvas image is lighter. (Whoa!)
+
+Of course, to actually *view* this change, you'll have to append `lfx.canvas` somewhere in the body of your document.
 
 ## Mini-documentation
 
 Here are the currently-available methods on a LightFX object
 
-**stackblur(<radius>)**  
+**stackblur(radius)**  
 Runs the highly-efficient stackblur algorithm over the canvas.  
 
-**lightblur(<radius>)**  
+**lightblur(radius)**  
 Runs the even-more-highly-efficient lightblur algorithm over the canvas.  
 
-**lightness(<lightness value>)**  
+**lightness(lightness value)**  
 Increase or decrease lightness linearly (accepts range -255 to +255)  
 
-**contras(<contrast value)**  
+**contras(contrast value)**  
 Increase or decrase contrast (accepts range -100 to +100)  
 
-**saturation(<saturation value>)**
+**saturation(saturation value)**
 Increase or decrase saturation (accepts range -255 to +255)
 
-**blurIn(<framerate>, <radius>)**
+**blurIn(framerate, radius)**
 Uses the `lightblur` algorithm to animate a blurring in of the image to the specified radius
 
-**blurOut(<framerate>, <radius>)**
+**blurOut(framerate, radius)**
 Uses the `lightblur` algorithm to animate a blurring out of the the image from the specified radius
 
 ## More to come
