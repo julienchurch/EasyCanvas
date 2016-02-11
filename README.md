@@ -30,7 +30,7 @@ I don't particularly recommend this. Instead, I prefer to run a simple python se
 
 This will satisfy the same origin policy, allowing canvas access to the files in this repository.
 
-### LightFX example 0
+### Example
 
 Let's add an image and create a LightFX object.
 
@@ -75,10 +75,10 @@ Increase or decrase contrast (accepts range -100 to +100)
 Increase or decrase saturation (accepts range -255 to +255)
 
 **blurIn(framerate, radius)**  
-Uses the `lightblur` algorithm to animate a blurring in of the image to the specified radius
+Uses the lightblur algorithm to animate a blurring in of the image to the specified radius
 
 **blurOut(framerate, radius)**  
-Uses the `lightblur` algorithm to animate a blurring out of the the image from the specified radius
+Uses the lightblur algorithm to animate a blurring out of the the image from the specified radius
 
 ## More to come
 
