@@ -69,7 +69,7 @@ Run the even-more-highly-efficient lightblur algorithm over the canvas
 **lightness(lightnessValue)**   
 Increase or decrease lightness linearly (accepts range -255 to +255)  
 
-**contras(contrastValue)**  
+**contrast(contrastValue)**  
 Increase or decrase contrast (accepts range -100 to +100)  
 
 **saturation(saturationValue)**  
