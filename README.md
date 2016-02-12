@@ -29,7 +29,7 @@ I don't particularly recommend this. Instead, I prefer to run a simple Python se
     cd examples
     python -m SimpleHTTPServer
 
-This will satisfy the same origin policy, allowing canvas access to the example files in this repository.
+This will satisfy the same origin policy, allowing canvas access to the example files in this repository. Just navigate to `localhost:8000` (or whatever port is listed in your console) and you're golden. 
 
 ### Example
 
@@ -43,13 +43,13 @@ var lfx = new LightFX(img);
 This duplicates the image into a canvas of the same dimensions. From here, transforming is easy:
 
 ```js
-lfx.lightblur(50); // 75-pixel pseudo-gassian blur based on stackblur
+lfx.lightblur(75); // 75 pixel radius pseudo-gassian blur based on stackblur
 ```
 
 Boom. Done. You blurred it. How about lightness?
 
 ```js
-lfx.lightness(100); // -255 to +255
+lfx.lightness(100); // range from -255 to +255
 ```
 
 Now your canvas image is lighter. (Whoa!)
