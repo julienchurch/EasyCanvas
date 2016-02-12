@@ -29,7 +29,7 @@ I don't particularly recommend this. Instead, I prefer to run a simple Python se
     cd examples
     python -m SimpleHTTPServer
 
-This will satisfy the same origin policy, allowing canvas access to the example files in this repository. Just navigate to `localhost:8000` (or whatever port is listed in your console) and you're golden. 
+This will satisfy the same origin policy, allowing canvas access to the example files in this repository. Just navigate to `localhost:8000` (or whatever port is listed in your console) in your browser and you're golden. 
 
 ### Example
 
